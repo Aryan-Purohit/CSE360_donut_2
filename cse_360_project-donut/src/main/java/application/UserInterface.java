@@ -42,7 +42,7 @@ public class UserInterface extends Application {
             String password = passwordField.getText();
 
             if (Login.getInstance().listUsers().isEmpty()) {
-                User newUser = Login.getInstance().registerUser(username, password, false, null);
+                User newUser = Login.getInstance().registerUser(username, password, "Admin", false, null);
                 currentUser = newUser; // Set currentUser here
                 showRegistrationScreen(newUser);
             } else {
@@ -136,6 +136,8 @@ public class UserInterface extends Application {
             System.out.println("Role Selected: " + selectedRole);
             if ("Admin".equals(selectedRole)) {
                 showAdminDashboard(user); // Pass the user object
+            } else if ("Instructor".equals(selectedRole)) {
+                showInstructorDashboard(user); // Show instructor dashboard
             } else {
                 showSimpleHomePage(user); // Pass the user object
             }
@@ -148,6 +150,58 @@ public class UserInterface extends Application {
     }
 
     private void showSimpleHomePage(User user) {
+        currentUser = user; // Set currentUser
+
+        VBox vbox = new VBox(10);
+        Button logoutButton = new Button("Logout");
+
+        // Search functionality
+        TextField searchField = new TextField();
+        searchField.setPromptText("Enter keyword to search");
+
+        Button searchButton = new Button("Search Articles");
+
+        Button listArticlesButton = new Button("List All Articles");
+
+        ListView<String> articlesListView = new ListView<>();
+
+        searchButton.setOnAction(e -> {
+            String keyword = searchField.getText();
+            if (keyword != null && !keyword.isEmpty()) {
+                List<User.HelpArticle> results = currentUser.searchHelpArticles(keyword.trim());
+                articlesListView.getItems().clear();
+                for (User.HelpArticle article : results) {
+                    articlesListView.getItems().add(article.getTitle());
+                }
+            }
+        });
+
+        listArticlesButton.setOnAction(e -> {
+            List<User.HelpArticle> articles = currentUser.getAllHelpArticles();
+            articlesListView.getItems().clear();
+            for (User.HelpArticle article : articles) {
+                articlesListView.getItems().add(article.getTitle());
+            }
+        });
+
+        logoutButton.setOnAction(e -> {
+            System.out.println("Logging out.");
+            showLoginScreen();
+        });
+
+        vbox.getChildren().addAll(
+                new Label("Home Page"),
+                new Separator(),
+                searchField, searchButton, listArticlesButton, articlesListView,
+                new Separator(),
+                logoutButton);
+
+        Scene homeScene = new Scene(vbox, 600, 800);
+        window.setScene(homeScene);
+        window.show();
+    }
+
+    private void showInstructorDashboard(User user) {
         currentUser = user; // Set currentUser
 
         VBox vbox = new VBox(10);
@@ -219,7 +273,7 @@ public class UserInterface extends Application {
         });
 
         vbox.getChildren().addAll(
-                new Label("Home Page"),
+                new Label("Instructor Dashboard"),
                 titleField, descriptionField, keywordsField, bodyArea, groupsField, levelField,
                 addArticleButton,
                 new Separator(),
@@ -227,8 +281,8 @@ public class UserInterface extends Application {
                 new Separator(),
                 backupButton, restoreButton, logoutButton);
 
-        Scene homeScene = new Scene(vbox, 600, 800);
-        window.setScene(homeScene);
+        Scene instructorScene = new Scene(vbox, 600, 800);
+        window.setScene(instructorScene);
         window.show();
     }
 
@@ -358,6 +412,10 @@ public class UserInterface extends Application {
         TextField newUserPasswordField = new TextField();
         newUserPasswordField.setPromptText("Enter Password");
 
+        ComboBox<String> roleComboBox = new ComboBox<>();
+        roleComboBox.getItems().addAll("Student", "Instructor");
+        roleComboBox.setValue("Student"); // Default role
+
         CheckBox oneTimePasswordCheckBox = new CheckBox("One-Time Password");
         TextField otpExpiryField = new TextField();
         otpExpiryField.setPromptText("OTP Expiry (YYYY-MM-DD HH:MM)");
@@ -366,12 +424,13 @@ public class UserInterface extends Application {
         Button deleteUserButton = new Button("Delete User");
         Button resetPasswordButton = new Button("Reset Password");
         Button listUsersButton = new Button("List Users");
-        Button addArticleButton = new Button("Add Article");
+        Button addArticleButton = new Button("Manage Articles");
         Button logoutButton = new Button("Logout");
 
         addUserButton.setOnAction(e -> {
             String username = usernameField.getText();
             String password = newUserPasswordField.getText();
+            String role = roleComboBox.getValue();
             boolean isOneTimePassword = oneTimePasswordCheckBox.isSelected();
             LocalDateTime otpExpiry = null;
 
@@ -385,7 +444,7 @@ public class UserInterface extends Application {
             }
 
             if (!username.isEmpty() && !password.isEmpty()) {
-                Login.getInstance().registerUser(username, password, isOneTimePassword, otpExpiry);
+                Login.getInstance().registerUser(username, password, role, isOneTimePassword, otpExpiry);
                 System.out.println("User added successfully.");
             } else {
                 System.out.println("Please enter a username and password.");
@@ -445,6 +504,7 @@ public class UserInterface extends Application {
                 new Label("Admin Dashboard"),
                 usernameField,
                 newUserPasswordField,
+                roleComboBox,
                 oneTimePasswordCheckBox,
                 otpExpiryField,
                 addUserButton,

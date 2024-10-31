@@ -39,14 +39,8 @@ public class Login {
         return false;
     }
 
-    public User registerUser(String username, String password, boolean isOneTimePassword, LocalDateTime otpExpiry) {
-        User newUser;
-        if (users.isEmpty()) {
-            newUser = new User(username, password, "Admin");
-        } else {
-            newUser = new User(username, password, "Student");
-        }
-
+    public User registerUser(String username, String password, String role, boolean isOneTimePassword, LocalDateTime otpExpiry) {
+        User newUser = new User(username, password, role);
         newUser.setOneTimePassword(isOneTimePassword);
         newUser.setOtpExpiry(otpExpiry);
         users.add(newUser);
