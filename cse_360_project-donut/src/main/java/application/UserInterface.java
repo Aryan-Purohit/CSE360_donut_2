@@ -242,13 +242,18 @@ public class UserInterface extends Application {
 
         ListView<String> articlesListView = new ListView<>();
 
+        // Map to hold articles with their IDs for easy deletion
+        Map<String, Long> articleTitleToIdMap = new HashMap<>();
+
         searchButton.setOnAction(e -> {
             String keyword = searchField.getText();
             if (keyword != null && !keyword.isEmpty()) {
                 List<User.HelpArticle> results = currentUser.searchHelpArticles(keyword.trim());
                 articlesListView.getItems().clear();
+                articleTitleToIdMap.clear();
                 for (User.HelpArticle article : results) {
                     articlesListView.getItems().add(article.getTitle());
+                    articleTitleToIdMap.put(article.getTitle(), article.getId());
                 }
             }
         });
@@ -256,8 +261,26 @@ public class UserInterface extends Application {
         listArticlesButton.setOnAction(e -> {
             List<User.HelpArticle> articles = currentUser.getAllHelpArticles();
             articlesListView.getItems().clear();
+            articleTitleToIdMap.clear();
             for (User.HelpArticle article : articles) {
                 articlesListView.getItems().add(article.getTitle());
+                articleTitleToIdMap.put(article.getTitle(), article.getId());
+            }
+        });
+
+        // Delete Article functionality
+        Button deleteArticleButton = new Button("Delete Selected Article");
+        deleteArticleButton.setOnAction(e -> {
+            String selectedTitle = articlesListView.getSelectionModel().getSelectedItem();
+            if (selectedTitle != null) {
+                Long articleId = articleTitleToIdMap.get(selectedTitle);
+                if (articleId != null) {
+                    currentUser.removeHelpArticle(articleId);
+                    System.out.println("Article Deleted: " + selectedTitle);
+                    articlesListView.getItems().remove(selectedTitle);
+                }
+            } else {
+                System.out.println("No article selected for deletion.");
             }
         });
 
@@ -277,7 +300,7 @@ public class UserInterface extends Application {
                 titleField, descriptionField, keywordsField, bodyArea, groupsField, levelField,
                 addArticleButton,
                 new Separator(),
-                searchField, searchButton, listArticlesButton, articlesListView,
+                searchField, searchButton, listArticlesButton, articlesListView, deleteArticleButton,
                 new Separator(),
                 backupButton, restoreButton, logoutButton);
 
@@ -325,13 +348,18 @@ public class UserInterface extends Application {
 
         ListView<String> articlesListView = new ListView<>();
 
+        // Map to hold articles with their IDs for easy deletion
+        Map<String, Long> articleTitleToIdMap = new HashMap<>();
+
         searchButton.setOnAction(e -> {
             String keyword = searchField.getText();
             if (keyword != null && !keyword.isEmpty()) {
                 List<User.HelpArticle> results = currentUser.searchHelpArticles(keyword.trim());
                 articlesListView.getItems().clear();
+                articleTitleToIdMap.clear();
                 for (User.HelpArticle article : results) {
                     articlesListView.getItems().add(article.getTitle());
+                    articleTitleToIdMap.put(article.getTitle(), article.getId());
                 }
             }
         });
@@ -339,8 +367,26 @@ public class UserInterface extends Application {
         listArticlesButton.setOnAction(e -> {
             List<User.HelpArticle> articles = currentUser.getAllHelpArticles();
             articlesListView.getItems().clear();
+            articleTitleToIdMap.clear();
             for (User.HelpArticle article : articles) {
                 articlesListView.getItems().add(article.getTitle());
+                articleTitleToIdMap.put(article.getTitle(), article.getId());
+            }
+        });
+
+        // Delete Article functionality
+        Button deleteArticleButton = new Button("Delete Selected Article");
+        deleteArticleButton.setOnAction(e -> {
+            String selectedTitle = articlesListView.getSelectionModel().getSelectedItem();
+            if (selectedTitle != null) {
+                Long articleId = articleTitleToIdMap.get(selectedTitle);
+                if (articleId != null) {
+                    currentUser.removeHelpArticle(articleId);
+                    System.out.println("Article Deleted: " + selectedTitle);
+                    articlesListView.getItems().remove(selectedTitle);
+                }
+            } else {
+                System.out.println("No article selected for deletion.");
             }
         });
 
@@ -361,7 +407,7 @@ public class UserInterface extends Application {
                 titleField, descriptionField, keywordsField, bodyArea, groupsField, levelField,
                 addArticleButton,
                 new Separator(),
-                searchField, searchButton, listArticlesButton, articlesListView,
+                searchField, searchButton, listArticlesButton, articlesListView, deleteArticleButton,
                 new Separator(),
                 backupButton, restoreButton, logoutButton
         );
