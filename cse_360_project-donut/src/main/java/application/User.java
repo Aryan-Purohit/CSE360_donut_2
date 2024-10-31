@@ -7,7 +7,7 @@ import java.util.*;
 public class User {
 
     private String username;
-    private byte[] password;
+    private byte[] password; // Password stored as bytes
     private String role;
     private String email;
     private String firstName;
@@ -16,18 +16,19 @@ public class User {
     private String preferredName;
     private boolean isOneTimePassword;
     private LocalDateTime otpExpiry;
-    private boolean isAccountSetupComplete = false;
-    private Map<String, String> topics = new HashMap<>(); // List of topics by level
+    private boolean isAccountSetupComplete = false; // Flag for account setup completion
 
-    // List of articles
-    private List<HelpArticle> helpArticles = new ArrayList<>();
+    private Map<String, String> topics = new HashMap<>(); // Map of topics and proficiency levels
 
+    private List<HelpArticle> helpArticles = new ArrayList<>(); // List of help articles
+
+    // Constructor to create a new user
     public User(String username, String password, String role) {
         this.username = username;
         this.password = password.getBytes();
         this.role = role;
-        this.isOneTimePassword = false;  // Default to no OTP
-        this.otpExpiry = null;  // No expiry by default
+        this.isOneTimePassword = false; // Default value
+        this.otpExpiry = null; // No expiry by default
 
         // Initialize default topics with "Intermediate" level
         topics.put("Topic 1", "Intermediate");
@@ -35,7 +36,7 @@ public class User {
         topics.put("Topic 3", "Intermediate");
     }
 
-    // Getters and Setters
+    // Getters and Setters for user attributes
 
     public String getUsername() {
         return username;
@@ -102,7 +103,7 @@ public class User {
         this.preferredName = preferredName;
     }
 
-    // One-time password related methods
+    // Methods related to one-time password
 
     public boolean isOneTimePassword() {
         return isOneTimePassword;
@@ -120,7 +121,7 @@ public class User {
         this.otpExpiry = otpExpiry;
     }
 
-    // Account setup completion
+    // Methods for account setup completion
 
     public boolean isAccountSetupComplete() {
         return isAccountSetupComplete;
@@ -130,7 +131,7 @@ public class User {
         this.isAccountSetupComplete = isAccountSetupComplete;
     }
 
-    // Topic proficiency methods
+    // Methods for topic proficiency
 
     public Map<String, String> getTopics() {
         return topics;
@@ -144,12 +145,11 @@ public class User {
         topics.put(topic, level);
     }
 
-    // Help Article structure
-
+    // Nested class representing a help article
     public static class HelpArticle implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        private long id;
+        private long id; // Unique identifier
         private String title;
         private String description;
         private List<String> keywords;
@@ -158,6 +158,7 @@ public class User {
         private List<String> groups;
         private String level;
 
+        // Constructor to create a new help article
         public HelpArticle(long id, String title, String description, List<String> keywords, String body, List<String> links, List<String> groups, String level) {
             this.id = id;
             this.title = title;
@@ -169,7 +170,7 @@ public class User {
             this.level = level;
         }
 
-        // Getters and Setters for HelpArticle
+        // Getters and Setters for help article attributes
 
         public long getId() { return id; }
 
@@ -195,16 +196,19 @@ public class User {
         public void setLevel(String level) { this.level = level; }
     }
 
-    // Help Articles management
+    // Methods for managing help articles
 
+    // Add a help article to the user's list
     public void addHelpArticle(HelpArticle article) {
         helpArticles.add(article);
     }
 
+    // Remove a help article by its ID
     public void removeHelpArticle(long id) {
         helpArticles.removeIf(article -> article.getId() == id);
     }
 
+    // Update an existing help article
     public void updateHelpArticle(long id, String title, String description, List<String> keywords, String body, List<String> links, List<String> groups, String level) {
         for (HelpArticle article : helpArticles) {
             if (article.getId() == id) {
@@ -219,6 +223,7 @@ public class User {
         }
     }
 
+    // Get help articles by group
     public List<HelpArticle> getHelpArticlesByGroup(String group) {
         if ("all".equalsIgnoreCase(group)) {
             return new ArrayList<>(helpArticles);
@@ -232,10 +237,12 @@ public class User {
         return filteredArticles;
     }
 
+    // Get all help articles
     public List<HelpArticle> getAllHelpArticles() {
         return new ArrayList<>(helpArticles);
     }
 
+    // Search help articles by keyword in title or keywords
     public List<HelpArticle> searchHelpArticles(String keyword) {
         List<HelpArticle> results = new ArrayList<>();
         for (HelpArticle article : helpArticles) {
